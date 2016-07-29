@@ -1,0 +1,14 @@
+{
+  "name": "node-opcua-isa95",
+  "version": "0.0.1",
+  "description": "ISA95 server extension for node-opcua",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "etienne.rossignon@gadz.org",
+  "license": "MIT",
+  "devDependencies": {
+    "should": "^10.0.0"
+  }
+}
