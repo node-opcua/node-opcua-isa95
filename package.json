@@ -10,5 +10,8 @@
   "license": "MIT",
   "devDependencies": {
     "should": "^10.0.0"
+  },
+  "dependencies": {
+    "underscore": "^1.8.3"
   }
 }

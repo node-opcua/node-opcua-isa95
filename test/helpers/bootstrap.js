@@ -16,12 +16,11 @@ var construct_ISA95_addressSpace = function (callback) {
 
     var addressSpace = new opcua.AddressSpace();
 
-    var isa95_xml_file = path.join(__dirname, "../../nodesets/Opc.ISA95.NodeSet2.xml");
-    fs.existsSync(isa95_xml_file).should.be.eql(true,isa95_xml_file + " should exist");
+    fs.existsSync(opcua.ISA95.nodeset_file).should.be.eql(true,opcua.ISA95.nodeset_file + " should exist");
 
     var xml_files = [
         opcua.standard_nodeset_file,
-        isa95_xml_file
+        opcua.ISA95.nodeset_file
     ];
     opcua.generate_address_space(addressSpace, xml_files, function (err) {
 

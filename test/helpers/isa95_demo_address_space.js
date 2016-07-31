@@ -1,5 +1,10 @@
 var opcua = require("node-opcua");
+var _ = require("underscore");
 
+require("../../")(opcua);
+
+var assert = require("assert");
+var should = require("should");
 
 exports.createEquipmentClassTypes = function (addressSpace) {
 
@@ -42,10 +47,11 @@ exports.createEquipmentClassTypes = function (addressSpace) {
             equipmentLevel: EquipmentLevel.EquipmentModule
         });
 
-        mixingReactorClassType.addISA95ClassProperty({
+        addressSpace.addISA95ClassProperty({
+            ISA95ClassPropertyOf: mixingReactorClassType,
+            typeDefinition: "ISA95ClassPropertyType",
             browseName: "Pressure",
             dataType: "Double"
-
         });
     }
 
@@ -56,40 +62,38 @@ exports.createEquipmentClassTypes = function (addressSpace) {
             equipmentLevel: EquipmentLevel.EquipmentModule
         });
 
-        heatingReactorClassType.addISA95ClassProperty({
+        addressSpace.addISA95ClassProperty({
+            ISA95ClassPropertyOf: heatingReactorClassType,
+            typeDefinition: "ISA95ClassPropertyType",
             browseName: "Temperature",
             dataType: "Double"
         });
     }
 
-    function defineHeatingMixingReactorClassType() {
-
-        var heatingMixingReactorClassType = addressSpace.addEquipmentClassType({
-            browseName: "HeatingMixingReactorClassType",
-            equipmentLevel: EquipmentLevel.EquipmentModule,
-            definedByEquipmentClass: [
-                "HeatingReactorClassType",
-                "MixingReactorClassType"
-            ]
-        });
-        var definedByEquipmentClass = addressSpace.findISA95ReferenceType("DefinedByEquipmentClass");
+    function defineHeatingMixingReactorType() {
 
         var heatingReactorClassType = addressSpace.findObjectType("HeatingReactorClassType");
         var mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType");
 
-        heatingMixingReactorClassType.addReference({
-            referenceType: definedByEquipmentClass.nodeId, nodeId: heatingReactorClassType
+        var heatingMixingReactorClassType = addressSpace.addEquipmentType({
+            browseName: "HeatingMixingReactorClassType",
+            equipmentLevel: EquipmentLevel.EquipmentModule,
+            definedByEquipmentClass: [
+                heatingReactorClassType,
+                mixingReactorClassType
+            ]
         });
 
-        heatingMixingReactorClassType.addReference({
-            referenceType: definedByEquipmentClass.nodeId, nodeId: mixingReactorClassType
-        });
 
-        mixingReactorClassType.addISA95ClassProperty({
+        addressSpace.addISA95ClassProperty({
+            ISA95ClassPropertyOf: heatingMixingReactorClassType,
+            typeDefinition: "ISA95ClassPropertyType",
             browseName: "Pressure",
             dataType: "Double"
         });
-        mixingReactorClassType.addISA95ClassProperty({
+        addressSpace.addISA95ClassProperty({
+            ISA95ClassPropertyOf: heatingMixingReactorClassType,
+            typeDefinition: "ISA95ClassPropertyType",
             browseName: "Temperature",
             dataType: "Double"
         });
@@ -110,7 +114,8 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 
     defineMixingReactorClassType();
     defineHeatingReactorClassType();
-    defineHeatingMixingReactorClassType();
+    defineHeatingMixingReactorType();
+
     defineCoordinateMeasuringMachineClassType();
     defineRobotClassType();
 
@@ -119,29 +124,56 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 
 exports.instantiateSampleISA95Model = function(addressSpace) {
 
+    assert(addressSpace instanceof opcua.AddressSpace);
+
+    if (!addressSpace.findObjectType("EnterpriseClassType")) {
+        exports.createEquipmentClassTypes(addressSpace);
+    }
 
     var enterpriseClassType = addressSpace.findObjectType("EnterpriseClassType");
+    should(enterpriseClassType).not.eql(null);
 
 
-    var enterprise = enterpriseClassType.instantiate({
-        browseName: "ACME Corporation"
+    var enterprise = addressSpace.addEquipment({
+        browseName: "ACME Corporation",
+        definedByEquipmentClass: enterpriseClassType
     });
+    enterprise.definedByEquipmentClass.should.eql(enterpriseClassType);
 
     enterprise.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Enterprise.value);
 
     var enterpriseSiteClassType = addressSpace.findObjectType("EnterpriseSiteClassType");
 
-    var site1 = enterpriseSiteClassType.instantiate({
-        browseName: "ACME Corporation- New Town site"
+    var site1 = addressSpace.addEquipment({
+        definedByEquipmentClass: enterpriseSiteClassType,
+        browseName: "ACME Corporation- New Town site",
         // ISA properties
+        containedByEquipment: enterprise
     });
     site1.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Site.value);
 
-    var site2 = enterpriseSiteClassType.instantiate({
-        browseName: "ACME Corporation- New Town site"
+    site1.definedByEquipmentClass.should.eql(enterpriseSiteClassType);
+
+
+    var site2 = addressSpace.addEquipment({
+        browseName: "ACME Corporation- New Town site",
+        definedByEquipmentClass: enterpriseSiteClassType,
         // ISA properties
+        containedByEquipment: enterprise
     });
     site2.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Site.value);
+
+    var equipmentType = addressSpace.findISA95ObjectType("EquipmentType");
+
+    //xx site2.typeDefinition.should.eql(equipmentType);
+
+    site2.definedByEquipmentClass.should.eql(enterpriseSiteClassType);
+
+    site2.containedByEquipment.should.eql(enterprise);
+
+    var r = site2.findReferencesEx(addressSpace.findISA95ReferenceType("MadeUpOfEquipment"),opcua.browse_service.BrowseDirection.Inverse);
+    r.length.should.eql(1);
+
 
 
 };
