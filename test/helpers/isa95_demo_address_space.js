@@ -75,8 +75,8 @@ exports.createEquipmentClassTypes = function (addressSpace) {
         var heatingReactorClassType = addressSpace.findObjectType("HeatingReactorClassType");
         var mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType");
 
-        var heatingMixingReactorClassType = addressSpace.addEquipmentType({
-            browseName: "HeatingMixingReactorClassType",
+        var heatingMixingReactorType = addressSpace.addEquipmentType({
+            browseName: "HeatingMixingReactorType",
             equipmentLevel: EquipmentLevel.EquipmentModule,
             definedByEquipmentClass: [
                 heatingReactorClassType,
@@ -86,13 +86,13 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 
 
         addressSpace.addISA95ClassProperty({
-            ISA95ClassPropertyOf: heatingMixingReactorClassType,
+            ISA95ClassPropertyOf: heatingMixingReactorType,
             typeDefinition: "ISA95ClassPropertyType",
             browseName: "Pressure",
             dataType: "Double"
         });
         addressSpace.addISA95ClassProperty({
-            ISA95ClassPropertyOf: heatingMixingReactorClassType,
+            ISA95ClassPropertyOf: heatingMixingReactorType,
             typeDefinition: "ISA95ClassPropertyType",
             browseName: "Temperature",
             dataType: "Double"
@@ -136,9 +136,10 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     var enterprise = addressSpace.addEquipment({
         browseName: "ACME Corporation",
+        organizedBy: addressSpace.rootFolder.objects,
         definedByEquipmentClass: enterpriseClassType
     });
-    enterprise.definedByEquipmentClass.should.eql(enterpriseClassType);
+    enterprise.definedByEquipmentClass[0].should.eql(enterpriseClassType);
 
     enterprise.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Enterprise.value);
 
@@ -146,17 +147,17 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     var site1 = addressSpace.addEquipment({
         definedByEquipmentClass: enterpriseSiteClassType,
-        browseName: "ACME Corporation- New Town site",
+        browseName: "ACME Corporation- Muenchen site",
         // ISA properties
         containedByEquipment: enterprise
     });
     site1.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Site.value);
 
-    site1.definedByEquipmentClass.should.eql(enterpriseSiteClassType);
+    site1.definedByEquipmentClass[0].should.eql(enterpriseSiteClassType);
 
 
     var site2 = addressSpace.addEquipment({
-        browseName: "ACME Corporation- New Town site",
+        browseName: "ACME Corporation- Marseille site",
         definedByEquipmentClass: enterpriseSiteClassType,
         // ISA properties
         containedByEquipment: enterprise
@@ -167,13 +168,50 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     //xx site2.typeDefinition.should.eql(equipmentType);
 
-    site2.definedByEquipmentClass.should.eql(enterpriseSiteClassType);
+    site2.definedByEquipmentClass[0].should.eql(enterpriseSiteClassType);
 
     site2.containedByEquipment.should.eql(enterprise);
 
     var r = site2.findReferencesEx(addressSpace.findISA95ReferenceType("MadeUpOfEquipment"),opcua.browse_service.BrowseDirection.Inverse);
     r.length.should.eql(1);
 
+    var equipmentClassType = addressSpace.findISA95ObjectType("EquipmentClassType");
+    equipmentClassType.browseName.toString().should.eql("1:EquipmentClassType");
+
+    var workUnit1 =addressSpace.addEquipment({
+        definedByEquipmentClass: equipmentClassType,
+        browseName: "WorkUnit A",
+        equipmentLevel: opcua.ISA95.EquipmentLevel.ProductionUnit,
+        containedByEquipment: site1,
+    });
+
+    var equipmentSet1 = addressSpace.addEquipment({
+        definedByEquipmentClass: equipmentClassType,
+        browseName: "WorkUnit",
+        containedByEquipment: workUnit1,
+        equipmentLevel: opcua.ISA95.EquipmentLevel.ProcessCell,
+        optionals: [ "AssetAssignment" ]
+    });
+
+
+    var heatingMixingReactorClassType = addressSpace.findObjectType("HeatingMixingReactorType");
+    assert(heatingMixingReactorClassType.isSupertypeOf(addressSpace.findISA95ObjectType("EquipmentType")));
+    var mixer = addressSpace.addEquipment({
+        browseName: "MixerA",
+        containedByEquipment: equipmentSet1,
+        typeDefinition: heatingMixingReactorClassType
+    });
+    mixer.definedByEquipmentClass.length.should.eql(2);
+
+
+    var robotClassType = addressSpace.findObjectType("RobotClassType");
+    var robot1 = addressSpace.addEquipment({
+        browseName: "WeldingRobot",
+        containedByEquipment: equipmentSet1,
+        definedByEquipmentClass: robotClassType
+    });
+
+    // add equipment in equipmentSet
 
 
 };

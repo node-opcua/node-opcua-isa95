@@ -77,7 +77,9 @@ describe("ISA95 ",function() {
                 definedByEquipmentClass:myEquipmentClassType
             });
             equipment.browseName.toString().should.eql("MyEquipment");
-            equipment.definedByEquipmentClass.browseName.toString().should.eql("MyEquipment2ClassType");
+
+            equipment.definedByEquipmentClass.length.should.eql(1);
+            equipment.definedByEquipmentClass[0].browseName.toString().should.eql("MyEquipment2ClassType");
 
             equipment.typeDefinitionObj.browseName.toString().should.eql("1:EquipmentType");
 
