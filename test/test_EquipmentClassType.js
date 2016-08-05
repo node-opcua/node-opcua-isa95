@@ -21,16 +21,23 @@ describe("ISA95 ",function() {
         }
     });
 
-
-    describe("Equipment class Type",function() {
-
+    describe("ISA95 Common services",function() {
 
         it("should extend the model with new methods dedicated to IS95",function() {
-
-            opcua.AddressSpace.prototype.addEquipmentClassType.should.be.instanceOf(Function);
-
             // ISA object must be enriched with useful ISA95 helper method
             opcua.AddressSpace.prototype.addISA95ClassProperty.should.be.instanceOf(Function);
+            opcua.AddressSpace.prototype.findISA95ObjectType.should.be.instanceOf(Function);
+
+        });
+
+    });
+    describe("Equipment class Type",function() {
+
+        it("should extend the model with new methods dedicated to IS95 Equipment",function() {
+
+            opcua.AddressSpace.prototype.addEquipmentClassType.should.be.instanceOf(Function);
+            opcua.AddressSpace.prototype.addEquipmentType.should.be.instanceOf(Function);
+            opcua.AddressSpace.prototype.addEquipment.should.be.instanceOf(Function);
 
         });
 
