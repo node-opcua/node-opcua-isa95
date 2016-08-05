@@ -134,7 +134,6 @@ describe("ISA95 ",function() {
                 containedByPhysicalAsset: computer
             });
 
-
             computer.madeUpOfPhysicalAssets().length.should.eql(3);
             displayDevice.madeUpOfPhysicalAssets().length.should.eql(0);
             keyboard.madeUpOfPhysicalAssets().length.should.eql(0);
@@ -143,6 +142,21 @@ describe("ISA95 ",function() {
             displayDevice.containedByPhysicalAsset.should.eql(computer);
             keyboard.containedByPhysicalAsset.should.eql(computer);
             mainUnit.containedByPhysicalAsset.should.eql(computer);
+        });
+
+        it("should allow to specify implementationOf as a Equipment",function() {
+
+            var frigeEquipment = addressSpace.addEquipment({
+                browseName:"FridgeEquipment"
+            });
+
+            var fridge = addressSpace.addPhysicalAsset({
+                browseName:"Fridge",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType",
+                implementationOf: frigeEquipment
+            });
+            fridge.browseName.toString().should.eql("Fridge");
+
         });
 
     });
