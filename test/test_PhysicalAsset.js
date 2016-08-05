@@ -74,7 +74,8 @@ describe("ISA95 ",function() {
             });
 
             physicalAsset.typeDefinitionObj.browseName.toString().should.eql("CustomPhysicalAssetType");
-
+            physicalAsset.definedByPhysicalAssetClass.length.should.eql(1);
+            physicalAsset.definedByPhysicalAssetClass[0].should.eql(addressSpace.findISA95ObjectType("PhysicalAssetClassType"));
 
         });
 
@@ -109,7 +110,40 @@ describe("ISA95 ",function() {
             asset.browseName.toString().should.eql("MyThermometer");
             asset.definedByPhysicalAssetClass.length.should.eql(1);
             asset.definedByPhysicalAssetClass[0].should.eql(temperatureSensorClassType);
+        });
 
-        })
+        it("should create physical Asset made up of other physical asset",function() {
+
+            var computer = addressSpace.addPhysicalAsset({
+                browseName:"Computer",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType"
+            });
+            var displayDevice = addressSpace.addPhysicalAsset({
+                browseName:"DisplayDevice",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType",
+                containedByPhysicalAsset: computer
+            });
+            var keyboard = addressSpace.addPhysicalAsset({
+                browseName:"Keyboard",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType",
+                containedByPhysicalAsset: computer
+            });
+            var mainUnit = addressSpace.addPhysicalAsset({
+                browseName:"MainUnit",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType",
+                containedByPhysicalAsset: computer
+            });
+
+
+            computer.madeUpOfPhysicalAssets().length.should.eql(3);
+            displayDevice.madeUpOfPhysicalAssets().length.should.eql(0);
+            keyboard.madeUpOfPhysicalAssets().length.should.eql(0);
+            mainUnit.madeUpOfPhysicalAssets().length.should.eql(0);
+
+            displayDevice.containedByPhysicalAsset.should.eql(computer);
+            keyboard.containedByPhysicalAsset.should.eql(computer);
+            mainUnit.containedByPhysicalAsset.should.eql(computer);
+        });
+
     });
 });

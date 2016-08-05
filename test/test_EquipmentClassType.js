@@ -124,10 +124,10 @@ describe("ISA95 ",function() {
             equipment2.containedByEquipment.should.eql(equipment1);
             equipment3.containedByEquipment.should.eql(equipment1);
 
-            equipment1.makeUpOfEquipments().length.should.eql(2);
+            equipment1.madeUpOfEquipments().length.should.eql(2);
 
-            equipment2.makeUpOfEquipments().length.should.eql(0);
-            equipment3.makeUpOfEquipments().length.should.eql(0);
+            equipment2.madeUpOfEquipments().length.should.eql(0);
+            equipment3.madeUpOfEquipments().length.should.eql(0);
         })
     });
     describe("Complete Model",function(){
