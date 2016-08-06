@@ -176,13 +176,13 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
     r.length.should.eql(1);
 
     var equipmentClassType = addressSpace.findISA95ObjectType("EquipmentClassType");
-    equipmentClassType.browseName.toString().should.eql("1:EquipmentClassType");
+    equipmentClassType.browseName.name.toString().should.eql("EquipmentClassType");
 
     var workUnit1 =addressSpace.addEquipment({
         definedByEquipmentClass: equipmentClassType,
         browseName: "WorkUnit A",
         equipmentLevel: opcua.ISA95.EquipmentLevel.ProductionUnit,
-        containedByEquipment: site1,
+        containedByEquipment: site1
     });
 
     var equipmentSet1 = addressSpace.addEquipment({
@@ -211,7 +211,122 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
         definedByEquipmentClass: robotClassType
     });
 
-    // add equipment in equipmentSet
+    // add physicalAssets
+    var fanuc_robotArcMate = addressSpace.addPhysicalAssetType({
+        browseName: "ArcMate 100iB/6S i",
+        modelNumber: "ArcMate 100iB/6S i",
+        manufacturer: {
+            dataType: "String",
+            value: { dataType: opcua.DataType.String, value: "Fanuc Inc"}
+        }
+    });
+
+    addressSpace.addISA95Attribute({
+        ISA95AttributeOf: fanuc_robotArcMate,
+        browseName: "Weight",
+        description: "Robot mass in kg",
+        dataType:"Double",
+        value: { dataType: opcua.DataType.Double, value: 135 },
+        modellingRule: "Mandatory"
+    });
+
+    addressSpace.addISA95Attribute({
+        ISA95AttributeOf: fanuc_robotArcMate,
+        browseName: "Payload",
+        description: "Payload in kg",
+        dataType:"Double",
+        value: { dataType: opcua.DataType.Double, value: 6 },
+        modellingRule: "Mandatory"
+    });
+    addressSpace.addISA95Attribute({
+        ISA95AttributeOf: fanuc_robotArcMate,
+        browseName: "Repeatability",
+        description: "+/-",
+        dataType:"Double",
+        value: { dataType: opcua.DataType.Double, value: 0.08 },
+        modellingRule: "Mandatory"
+    });
+    addressSpace.addISA95Attribute({
+        ISA95AttributeOf: fanuc_robotArcMate,
+        browseName: "HReach",
+        description: "in mm",
+        dataType:"Double",
+        value: { dataType: opcua.DataType.Double, value: 1373 },
+        modellingRule: "Mandatory"
+    });
+
+
+    var axis = addressSpace.addPhysicalAsset({
+        containedByPhysicalAsset: fanuc_robotArcMate,
+        definedByPhysicalAssetClass: "PhysicalAssetClassType",
+        browseName: "Axis",
+        modellingRule: "Mandatory"
+    });
+
+    /**
+     *
+     * @param name
+     * @param lowRange  in Degree
+     * @param highRange in Degree
+     * @param maxSpeed  in Degree per second
+     */
+    function add_join(name,lowRange,highRange,maxSpeed) {
+        var join = addressSpace.addPhysicalAsset({
+            containedByPhysicalAsset: axis,
+            definedByPhysicalAssetClass: "PhysicalAssetClassType",
+            browseName: name,
+            modellingRule: "Mandatory"
+        });
+        addressSpace.addISA95Attribute({
+            ISA95AttributeOf: join,
+            browseName: "RangeLow",
+            dataType:"Double",
+            value: { dataType: opcua.DataType.Double, value: lowRange },
+            modellingRule: "Mandatory"
+        });
+        addressSpace.addISA95Attribute({
+            ISA95AttributeOf: join,
+            browseName: "RangeHigh",
+            dataType:"Double",
+            value: { dataType: opcua.DataType.Double, value: highRange },
+            modellingRule: "Mandatory"
+        });
+    }
+    add_join("J1",-170,170  , 150);
+    add_join("J2", -90,190  , 160);
+    add_join("J3",-170,145  , 170);
+    add_join("J4",-190,190  , 400);
+    add_join("J5",-140,140  , 400);
+    add_join("J6",-360,360  , 520);
+
+
+
+    addressSpace.addISA95Attribute({
+        ISA95AttributeOf: fanuc_robotArcMate,
+        browseName: "Documentation",
+        dataType: "String",
+        value: { dataType: opcua.DataType.String, value: "https://www.robots.com/fanuc/arcmate-100ib-6s"},
+        modellingRule: "Mandatory"
+    });
+
+
+    var physicalAssetSet = addressSpace.addObject({
+        browseName: "PhysicalAssetSet",
+        typeDefinition: "FolderType",
+        organizedBy: addressSpace.rootFolder.objects,
+    });
+
+    var robot_instance = addressSpace.addPhysicalAsset({
+        organizedBy:     physicalAssetSet,
+        typeDefinition:  fanuc_robotArcMate,
+        definedByPhysicalAssetClass: "PhysicalAssetClassType",
+        browseName: "FANUC Arc Mate 100iB/6S i - 001",
+        implementationOf: robot1,
+        vendorId: {
+            dataType: "String",
+            value: { dataType: opcua.DataType.String, value: "RobotWox" }
+        }
+    });
 
 
 };

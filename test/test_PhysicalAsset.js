@@ -28,7 +28,7 @@ describe("ISA95 ",function() {
         it("should extend the model with new methods dedicated to IS95 Physical Asset",function() {
 
             opcua.AddressSpace.prototype.addPhysicalAssetClassType.should.be.instanceOf(Function);
-           //xx opcua.AddressSpace.prototype.addPhysicalAssetType.should.be.instanceOf(Function);
+            opcua.AddressSpace.prototype.addPhysicalAssetType.should.be.instanceOf(Function);
             opcua.AddressSpace.prototype.addPhysicalAsset.should.be.instanceOf(Function);
 
         });
@@ -44,8 +44,79 @@ describe("ISA95 ",function() {
             });
             myPhysicalAssetClassType.browseName.toString().should.eql("MyPhysicalAssetClassType");
             myPhysicalAssetClassType.subtypeOfObj.browseName.toString().should.eql("1:PhysicalAssetClassType");
+        });
+
+        describe("addPhysicalAssetType",function() {
+
+            it("should addPhysicalAssetType",function() {
+
+                var myPhysicalAssetType= addressSpace.addPhysicalAssetType({
+                   browseName:"MyPhysicalAssetType"
+                });
+
+                var attr = addressSpace.addISA95Attribute({
+                    ISA95AttributeOf: myPhysicalAssetType,
+                    browseName: "MyAttribute",
+                    dataType:"String",
+                    value: { dataType: opcua.DataType.String,value:"SomeValue"},
+                    modellingRule: "Mandatory"
+                });
+
+
+                var hasISA95Attribute = addressSpace.findISA95ReferenceType("HasISA95Attribute");
+                hasISA95Attribute.browseName.toString().should.eql("1:HasISA95Attribute");
+
+                myPhysicalAssetType.findReferencesExAsObject(hasISA95Attribute).length.should.eql(1);
+                myPhysicalAssetType.findReferencesExAsObject(hasISA95Attribute)[0].browseName.toString().should.eql("MyAttribute");
+
+                //
+                var instance =  addressSpace.addPhysicalAsset({
+                    typeDefinition:myPhysicalAssetType,
+                    browseName: "MyInstance"
+                });
+
+                instance.typeDefinitionObj.browseName.toString().should.eql("MyPhysicalAssetType");
+                instance.findReferencesExAsObject(hasISA95Attribute).length.should.eql(1);
+                instance.findReferencesExAsObject(hasISA95Attribute)[0].browseName.toString().should.eql("MyAttribute");
+
+           });
+
+            it("should addPhysicalAssetType made up of a sub component, and instantiate it",function() {
+
+
+                var myPhysicalAssetType= addressSpace.addPhysicalAssetType({
+                    browseName:"MyPhysicalAssetType2"
+                });
+
+                var subPhysicalAsset = addressSpace.addPhysicalAsset({
+                    containedByPhysicalAsset: myPhysicalAssetType,
+                    browseName: "MySubComponent",
+                    modellingRule: "Mandatory"
+                });
+
+
+                var madeUpOfPhysicalAsset = addressSpace.findISA95ReferenceType("MadeUpOfPhysicalAsset");
+                madeUpOfPhysicalAsset.browseName.toString().should.eql("1:MadeUpOfPhysicalAsset");
+
+                myPhysicalAssetType.findReferencesExAsObject(madeUpOfPhysicalAsset).length.should.eql(1);
+                myPhysicalAssetType.findReferencesExAsObject(madeUpOfPhysicalAsset)[0].browseName.toString().should.eql("MySubComponent");
+
+                //
+                var instance =  addressSpace.addPhysicalAsset({
+                    typeDefinition:myPhysicalAssetType,
+                    browseName: "MyInstance"
+                });
+
+                instance.typeDefinitionObj.browseName.toString().should.eql("MyPhysicalAssetType2");
+                instance.findReferencesExAsObject(madeUpOfPhysicalAsset).length.should.eql(1);
+                instance.findReferencesExAsObject(madeUpOfPhysicalAsset)[0].browseName.toString().should.eql("MySubComponent");
+
+            });
+
 
         });
+
+
 
         it ("should instantiate a physical asset",function() {
 
@@ -100,11 +171,9 @@ describe("ISA95 ",function() {
             // extend type with units
 
             // now implement a temperature sensor object
-
             var asset = addressSpace.addPhysicalAsset({
                 browseName: "MyThermometer",
                 definedByPhysicalAssetClass: temperatureSensorClassType,
-                vendorId: "#123456732423"
             });
 
             asset.browseName.toString().should.eql("MyThermometer");
@@ -158,6 +227,48 @@ describe("ISA95 ",function() {
             fridge.browseName.toString().should.eql("Fridge");
 
         });
+
+        it("should allow to specify a vendorId",function() {
+
+            var companyType = addressSpace.findISA95VariableType("CompanyType");
+            companyType.browseName.toString().should.eql("1:CompanyType");
+
+            var vendorIdNode = addressSpace.addVariable({
+                browseName: "Vendor2",
+                typeDefinition: companyType,
+                dataType: "String",
+                value: { dataType: opcua.DataType.String, value: "ACMO Corp Inc."}
+            });
+
+
+            var someAsset = addressSpace.addPhysicalAsset({
+                browseName:"someAsset2",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType",
+                vendorId: {
+                    dataType: "String",
+                    value : {
+                        dataType: opcua.DataType.String,
+                        value: "AcmeCorporation"
+                    }
+                }
+            });
+            someAsset.vendorId.browseName.toString().should.eql("VendorId");
+            someAsset.vendorId.readValue().value.value.toString().should.eql("AcmeCorporation");
+            someAsset.vendorId.dataType.toString().should.eql("ns=0;i=12"); // nodeId of DataType String
+
+        });
+
+        it("should allow to specify a fixedAssetId",function() {
+
+            var someAsset = addressSpace.addPhysicalAsset({
+                browseName:"someAsset1",
+                definedByPhysicalAssetClass: "PhysicalAssetClassType",
+                fixedAssetId: "SN12343567"
+            });
+            someAsset.fixedAssetId.browseName.toString().should.eql("FixedAssetId");
+            someAsset.fixedAssetId.readValue().value.value.should.eql("SN12343567");
+        });
+
 
     });
 });
