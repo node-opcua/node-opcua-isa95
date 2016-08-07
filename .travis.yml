@@ -12,6 +12,7 @@ before_script:
   - npm install -g istanbul coveralls
   - npm install -g mocha
   - npm install -g codeclimate-test-reporter
+  - npm install  https://github.com/node-opcua/node-opcua
   - npm install
 
 after_success:
