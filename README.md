@@ -86,6 +86,7 @@ var weldingRobotClassType = addressSpace.addEquipmentClassType({
 ### opcua.AddressSpace#addEquipmentType(options)
 
 add a new EquipmentType to the addressSpace
+
 | options                           | type                          | description                                                        |
 |-----------------------------------|-------------------------------|--------------------------------------------------------------------|
 | options.browseName                | {String/QualifiedName}        | the browseName of the new node equipment                           |
@@ -261,6 +262,7 @@ returns a ```opcua.UAVariable````
 
 This DataType is an enumeration that defines the equipment element levels defined in ISA-95. Its values are
 defined in a below table.
+
 | Value       | Description |
 |-------------|-------------|
 | Enterprise  | An enterprise is a collection of sites and areas and represents the top level of a role based equipment hierarchy.|
@@ -277,7 +279,7 @@ defined in a below table.
 | WorkUnit       | A work unit is any element of the equipment hierarchy under a work centre. Work units are the lowest  form of elements in an equipment hierarchy that are typically scheduled by Level 3 functions.|
 | EquipmentModule| An equipment module entity is an engineered subdivision of a process cell, a unit, or another equipment module. |
 | ControlModule  | A control module entity is an engineered subdivision of a process cell, a unit, an equipment module, or another control module. |
-| Other          | non of the obove |
+| Other          | non of the above |
 
 
 # license
