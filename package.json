@@ -4,7 +4,11 @@
   "description": "ISA95 server extension for node-opcua",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test --color -R spec --recursive --timeout 200000 --bail"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/node-opcua/node-opcua-isa95.git"
   },
   "keywords": [
     "opcua",
@@ -15,7 +19,10 @@
     "Industry 4.0",
     "Manufacturing Execution System"
   ],
-  "author": "etienne.rossignon@gadz.org",
+  "author": "Etienne Rossignon",
+  "bugs": {
+    "url": "https://github.com/node-opcua/node-opcua-isa95/issues"
+  },
   "license": "MIT",
   "devDependencies": {
     "should": "^10.0.0"
