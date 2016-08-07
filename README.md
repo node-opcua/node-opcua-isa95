@@ -5,6 +5,10 @@ creation of ISA95 OPCUA server, in the industrial world.
 
 It follows the specification in [OPCUA ISA95 Specification](https://opcfoundation.org/developer-tools/specifications-unified-architecture/isa-95-common-object-model)
 
+
+[![Build Status](https://travis-ci.org/node-opcua/node-opcua-isa95.svg?branch=master)](https://travis-ci.org/node-opcua/node-opcua-isa95)
+
+
 ## installation
 
 * install node-opcua-isa95 module along side node-opcua
