@@ -227,8 +227,8 @@ var robot_instance = addressSpace.addPhysicalAsset({
 | options.browseName                | {String/QualifiedName}        | the browseName of the new node equipment                           |
 | options.dataType                  | {String/UADataType}           | the Variable DataType                           |
 | options.value                     | {Variant}                     | the Variable Value         |
-| options.ISA95PropertyOf           | {UAObject/UAObjecType}        | the parent node |
-| [options.modellingRule]           | {String}                      | "Mandatory" or "Optionnal"|
+| options.ISA95AttributeOf          | {UAObject/UAObjecType}        | the parent node |
+| [options.modellingRule]           | {String}                      | "Mandatory" or "Optional"|
 | [options.typeDefinition]           | {UAVariableType}              ||
 
 returns a ```opcua.UAVariable````
@@ -240,8 +240,8 @@ returns a ```opcua.UAVariable````
 | options.browseName                | {String/QualifiedName}        | the browseName of the new node equipment                           |
 | options.dataType                  | {String/UADataType}           | the Variable DataType                           |
 | options.value                     | {Variant}                     | the Variable Value         |
-| options.ISA95AttributeOf          | {UAObject/UAObjecType}        | the parent node |
-| [options.modellingRule]           | {String}                      | "Mandatory" or "Optionnal"|
+| options.ISA95PropertyOf           | {UAObject/UAObjecType}        | the parent node |
+| [options.modellingRule]           | {String}                      | "Mandatory" or "Optional"|
 | [options.typeDefinition]           | {UAVariableType}              ||
 
 returns a ```opcua.UAVariable````
