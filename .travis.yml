@@ -1,18 +1,22 @@
 sudo: false
 language: node_js
-node_js:
-  # dropping support for node 0.10 - "0.10"
-  - "0.12"
-  - "4"
-  - "5"
-  - "6"
-
+matrix:
+  include:
+  - node_js: 6
+  - node_js: 7
+  - node_js: "lts/*"
+  - node_js: 9
+  - node_js: 10
+  allow_failures:
+  - node_js: 6
+  - node_js: 7
+  - node_js: 9
+  - node_js: 10
 
 before_script:
   - npm install -g istanbul coveralls
   - npm install -g mocha
   - npm install -g codeclimate-test-reporter
-  - npm install  https://github.com/node-opcua/node-opcua
   - npm install
 
 after_success:
@@ -32,3 +36,7 @@ notifications:
     on_success: always  # options: [always|never|change] default: always
     on_failure: always  # options: [always|never|change] default: always
     on_start: true     # default: false
+
+cache:
+  directories:
+  - "node_modules"
