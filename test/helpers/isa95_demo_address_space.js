@@ -34,11 +34,11 @@ exports.createEquipmentClassTypes = function (addressSpace) {
             equipmentLevel: EquipmentLevel.ProductionUnit
         });
     }
+
     defineEnterpriseClassType();
     defineEnterpriseSiteClassType();
     defineEnterpriseSiteAreaClassType();
     defineEnterpriseSiteAreaProductionUnitClassType();
-
 
     function defineMixingReactorClassType() {
 
@@ -111,11 +111,9 @@ exports.createEquipmentClassTypes = function (addressSpace) {
         });
     }
 
-
     defineMixingReactorClassType();
     defineHeatingReactorClassType();
     defineHeatingMixingReactorType();
-
     defineCoordinateMeasuringMachineClassType();
     defineRobotClassType();
 
@@ -296,14 +294,13 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
                 modellingRule: "Mandatory"
             });
         }
-        add_join("J1",-170,170  , 150);
-        add_join("J2", -90,190  , 160);
-        add_join("J3",-170,145  , 170);
-        add_join("J4",-190,190  , 400);
-        add_join("J5",-140,140  , 400);
-        add_join("J6",-360,360  , 520);
 
-
+        add_join("J1",-170,170,150);
+        add_join("J2", -90,190,160);
+        add_join("J3",-170,145,170);
+        add_join("J4",-190,190,400);
+        add_join("J5",-140,140,400);
+        add_join("J6",-360,360,520);
 
         addressSpace.addISA95Attribute({
             ISA95AttributeOf: fanuc_robotArcMate,
@@ -326,8 +323,6 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
         organizedBy: addressSpace.rootFolder.objects,
     });
 
-
-
     var robot_instance = addressSpace.addPhysicalAsset({
         organizedBy:     physicalAssetSet,
         typeDefinition:  fanuc_robotArcMate,
@@ -339,6 +334,5 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
             value: { dataType: opcua.DataType.String, value: "RobotWox" }
         }
     });
-
 
 };

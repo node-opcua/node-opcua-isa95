@@ -1,6 +1,6 @@
 {
   "name": "node-opcua-isa95",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ISA95 server extension for node-opcua",
   "main": "index.js",
   "scripts": {
@@ -25,10 +25,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "should": "^11.1.1"
+    "should": "^13.2.3",
+    "node-opcua": "^0.4.1"
   },
   "dependencies": {
-    "semver": "^5.3.0",
-    "underscore": "^1.8.3"
+    "semver": "^5.5.1",
+    "underscore": "^1.9.1"
   }
 }

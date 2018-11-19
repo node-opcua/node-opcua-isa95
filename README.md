@@ -1,13 +1,17 @@
-# isa95 extension for node-opcua
+[![OPC UA](http://b.repl.ca/v1/OPC--UA-ISA95-orange.png)](http://opcfoundation.org/)
+[![NPM version](https://badge.fury.io/js/node-opcua-isa95.png)](http://badge.fury.io/js/node-opcua-isa95)
+[![NPM download](https://img.shields.io/npm/dm/node-opcua-isa95.svg)](http://www.npm-stats.com/~packages/node-opcua-isa95)
+[![Build Status](https://travis-ci.org/node-opcua/node-opcua-isa95.svg?branch=master)](https://travis-ci.org/node-opcua/node-opcua-isa95)
+[![HitCount](http://hits.dwyl.io/node-opcua/node-opcua-isa95.svg)](http://hits.dwyl.io/node-opcua/node-opcua-isa95)
+
+# ISA95 Common Object Model 
+
+## an extension package for node-opcua
 
 This NPM module implements the ISA95 extensions for node-opcua, to ease the
 creation of ISA95 OPCUA server, in the industrial world.
 
 It follows the specification in [OPCUA ISA95 Specification](https://opcfoundation.org/developer-tools/specifications-unified-architecture/isa-95-common-object-model)
-
-
-[![Build Status](https://travis-ci.org/node-opcua/node-opcua-isa95.svg?branch=master)](https://travis-ci.org/node-opcua/node-opcua-isa95)
-
 
 ## installation
 
@@ -19,7 +23,6 @@ npm install node-opcua-isa95 --save
 ```
 
 * use ```require("node-opcua-isa95")(opcua);``` to enrich node-opcua with the ISA95 add-on
-
 
 ```javascript
 var opcua = require("node-opcua");
@@ -41,32 +44,30 @@ var server = new opcua.OPCUAServer({
 
 function post_initialize() {
     console.log("initialized");
-
     var addressSpace = server.engine.addressSpace;
 
     // add your ISA95 node in the addressSpace here
-
-
-
     server.start(function() {
         console.log("Server is now listening ... ( press CTRL+C to stop)");
         console.log("port ", server.endpoints[0].port);
         var endpointUrl = server.endpoints[0].endpointDescriptions()[0].endpointUrl;
         console.log(" the primary server endpoint url is ", endpointUrl );
     });
-
 }
+
 server.initialize(post_initialize);
 
-
 ```
-# API documentation
 
+## Projects using node-opcua-isa95
+
+ISA95 extension is ready to use with [Node-RED][1] via [node-red-contrib-iiot-opcua][2]
+
+# API documentation
 
 ## Equipment
 
-ISA 95 logical Equipments can be added to the addressSpace and
-defined using the following API.
+ISA 95 logical Equipments can be added to the addressSpace and defined using the following API.
 
 ### opcua.AddressSpace#addEquipmentClassType(options)
 
@@ -81,7 +82,7 @@ add a new EquipmentClassType to the addressSpace
 
 ```javascript
 var weldingRobotClassType = addressSpace.addEquipmentClassType({
-    browseName: "WeldingRobotClassType"
+    browseName: "WeldingRobotClassType",
     equipmentLevel: opcua.ISA95.EquipmentLevel.EquipmentModule
 });
 
@@ -98,7 +99,8 @@ add a new EquipmentType to the addressSpace
 | [options.definedByEquipmentClass  | {UAObjectType/ Array<UAObjectType> }  | a collection of EquipmentClassType that define this new EquipmentType |
 
 
-#### example
+#### Example of addEquipmentClassType
+
 ```javascript
 var multiPurposeRobotType = addressSpace.addEquipmentClassType({
     browseName: "MultiPurposeRobotType",
@@ -113,7 +115,6 @@ var multiPurposeRobotType = addressSpace.addEquipmentClassType({
 
 add a new equipment to the addressSpace
 
-
 | options                           | type                          | description                                                        |
 |-----------------------------------|-------------------------------|--------------------------------------------------------------------|
 | options.browseName                | {String/QualifiedName}        | the browseName of the new node equipment                           |
@@ -123,9 +124,9 @@ add a new equipment to the addressSpace
 | [options.organizedBy]             | {UAObject}                    | a folder {FolderType} that organises the created equipment                      |
 
 
-#### example 1
+#### Example of addEquipment
 
-``` javascript
+```javascript
 var weldingRobot = addressSpace.addEquipment({
   browseName: "WeldingRobot",
 });
@@ -139,10 +140,7 @@ var robotArm = addressSpace.addEquipment({
   browseName: "RobotArm",
   containedByEquipment: weldingRobot
 });
-
 ```
-
-
 
 ## PhysicalAsset
 
@@ -150,10 +148,9 @@ var robotArm = addressSpace.addEquipment({
 
 ### opcua.AddressSpace#addPhysicalAssetType
 
+#### Example of addPhysicalAssetType
 
-#### example
-
-``` javascript
+```javascript
 var fanuc_robotArcMate = addressSpace.addPhysicalAssetType({
     browseName: "ArcMate 100iB/6S i",
     modelNumber: "ArcMate 100iB/6S i",
@@ -192,7 +189,7 @@ addressSpace.addISA95Attribute({
 
 ### AddressSpace#addPhysicalAsset
 
-#### example
+#### Example of PhysicalAssetSet
 
 ```javascript
 // create the physical asset set storage  folder
@@ -214,9 +211,7 @@ var robot_instance = addressSpace.addPhysicalAsset({
         value: { dataType: opcua.DataType.String, value: "RobotWox" }
     }
 });
-
 ```
-
 
 ## Misc
 
@@ -245,7 +240,6 @@ returns a ```opcua.UAVariable````
 | [options.typeDefinition]           | {UAVariableType}              ||
 
 returns a ```opcua.UAVariable````
-
 
 ### opcua.AddressSpace#addISA95ClassProperty
 
@@ -285,9 +279,11 @@ defined in a below table.
 | ControlModule  | A control module entity is an engineered subdivision of a process cell, a unit, an equipment module, or another control module. |
 | Other          | non of the above |
 
-
 # license
 MIT
 
 # Copyright
 Copyright 2016 - Etienne Rossignon
+
+[1]:https://github.com/node-red/node-red
+[2]:https://github.com/biancode/node-red-contrib-iiot-opcua

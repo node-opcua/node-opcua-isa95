@@ -1,8 +1,4 @@
 
-process.env.NODE_PATH="c:\\projects\\NodeOPCUA\\node-opcua" + ";" + process.env.NODE_PATH;
-require('module').Module._initPaths();
-//xx module.paths.push("c:\\projects\\NodeOPCUA\\node-opcua");
-
 var opcua  = require("node-opcua");
 var should = require("should");
 var fs = require("fs");
@@ -28,7 +24,26 @@ var construct_ISA95_addressSpace = function (callback) {
         callback(err,addressSpace);
     });
 };
+
+var get_node_opcua_path = function () {
+  let resolvedNodeOPCUA = require.resolve('node-opcua')
+  let pathToNodeOPCUA = ''
+
+  if (this.isWindows) {
+    pathToNodeOPCUA = resolvedNodeOPCUA.replace('\\index.js', '')
+  } else {
+    pathToNodeOPCUA = resolvedNodeOPCUA.replace('/index.js', '')
+  }
+
+  return pathToNodeOPCUA
+}
+
 exports.construct_ISA95_addressSpace = construct_ISA95_addressSpace;
+exports.get_node_opcua_path = get_node_opcua_path;
+
+process.env.NODE_PATH = get_node_opcua_path() + ";" + process.env.NODE_PATH;
+require('module').Module._initPaths();
+
 //xx after(function () {
 //xx s    addressSpace.dispose();
 //xx     addressSpace = null;
