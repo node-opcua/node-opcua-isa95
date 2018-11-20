@@ -1,12 +1,12 @@
-var should = require("should");
+const should = require("should");
 
-var construct_ISA95_addressSpace = require("./helpers/bootstrap").construct_ISA95_addressSpace;
+const construct_ISA95_addressSpace = require("./helpers/bootstrap").construct_ISA95_addressSpace;
 
-var opcua = require("node-opcua");
+const opcua = require("node-opcua");
 
 describe("GitHub Issues ",function() {
 
-    var addressSpace = null;
+    let addressSpace = null;
     this.timeout(20000);
 
     before(function (done) {
@@ -26,11 +26,11 @@ describe("GitHub Issues ",function() {
 
     it("#2 - should be possible to specify nodeId in addEquipment",function() {
 
-      var equipment = addressSpace.addEquipment({
+      const equipment = addressSpace.addEquipment({
           browseName:"SomeEquiment",
-          nodeId: "ns=12;i=1234"
+          nodeId: "i=1234"
       });
-      equipment.nodeId.toString().should.eql("ns=12;i=1234");
+      equipment.nodeId.toString().should.eql("ns=1;i=1234");
     });
 
 });

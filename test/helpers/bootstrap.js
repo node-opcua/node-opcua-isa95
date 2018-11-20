@@ -1,20 +1,20 @@
 
-var opcua  = require("node-opcua");
-var should = require("should");
-var fs = require("fs");
-var path = require("path");
+const opcua  = require("node-opcua");
+const should = require("should");
+const fs = require("fs");
+const path = require("path");
 
-var construct_ISA95_addressSpace = function (callback) {
+const construct_ISA95_addressSpace = function (callback) {
 
 
     // add ISA95 Extensions
     require("../../index")(opcua);
 
-    var addressSpace = new opcua.AddressSpace();
+    let addressSpace = new opcua.AddressSpace();
 
     fs.existsSync(opcua.ISA95.nodeset_file).should.be.eql(true,opcua.ISA95.nodeset_file + " should exist");
 
-    var xml_files = [
+    const xml_files = [
         opcua.standard_nodeset_file,
         opcua.ISA95.nodeset_file
     ];
@@ -25,7 +25,7 @@ var construct_ISA95_addressSpace = function (callback) {
     });
 };
 
-var get_node_opcua_path = function () {
+const get_node_opcua_path = function () {
   let resolvedNodeOPCUA = require.resolve('node-opcua')
   let pathToNodeOPCUA = ''
 

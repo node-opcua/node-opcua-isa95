@@ -194,7 +194,8 @@ addressSpace.addISA95Attribute({
 ```javascript
 // create the physical asset set storage  folder
 // where all our main assets will be listed
-var physicalAssetSet = addressSpace.addObject({
+var namespace = addressSpace.getOwnNamespace();
+var physicalAssetSet = namespace.addObject({
     browseName: "PhysicalAssetSet",
     typeDefinition: "FolderType",
     organizedBy: addressSpace.rootFolder.objects,

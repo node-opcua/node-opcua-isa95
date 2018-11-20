@@ -1,35 +1,35 @@
-var opcua = require("node-opcua");
-var _ = require("underscore");
+const opcua = require("node-opcua");
+const _ = require("underscore");
 
 require("../../")(opcua);
 
-var assert = require("assert");
-var should = require("should");
+const assert = require("assert");
+const should = require("should");
 
 exports.createEquipmentClassTypes = function (addressSpace) {
 
-    var EquipmentLevel = opcua.ISA95.EquipmentLevel;
+    const EquipmentLevel = opcua.ISA95.EquipmentLevel;
 
     function defineEnterpriseClassType() {
-        var enterpriseClassType = addressSpace.addEquipmentClassType({
+        const enterpriseClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseClassType",
             equipmentLevel: EquipmentLevel.Enterprise
         });
     }
     function defineEnterpriseSiteClassType() {
-        var enterpriseSiteClassType = addressSpace.addEquipmentClassType({
+        const enterpriseSiteClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseSiteClassType",
             equipmentLevel: EquipmentLevel.Site
         });
     }
     function defineEnterpriseSiteAreaClassType() {
-        var enterpriseSiteAreaClassType = addressSpace.addEquipmentClassType({
+        const enterpriseSiteAreaClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseSiteAreaClassType",
             equipmentLevel: EquipmentLevel.Area
         });
     }
     function defineEnterpriseSiteAreaProductionUnitClassType() {
-        var enterpriseSiteAreaProductionUnitClassType = addressSpace.addEquipmentClassType({
+        const enterpriseSiteAreaProductionUnitClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseSiteAreaProductionUnitClassType",
             equipmentLevel: EquipmentLevel.ProductionUnit
         });
@@ -42,7 +42,7 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 
     function defineMixingReactorClassType() {
 
-        var mixingReactorClassType = addressSpace.addEquipmentClassType({
+        const mixingReactorClassType = addressSpace.addEquipmentClassType({
             browseName: "MixingReactorClassType",
             equipmentLevel: EquipmentLevel.EquipmentModule
         });
@@ -57,7 +57,7 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 
     function defineHeatingReactorClassType() {
 
-        var heatingReactorClassType = addressSpace.addEquipmentClassType({
+        const heatingReactorClassType = addressSpace.addEquipmentClassType({
             browseName: "HeatingReactorClassType",
             equipmentLevel: EquipmentLevel.EquipmentModule
         });
@@ -72,10 +72,17 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 
     function defineHeatingMixingReactorType() {
 
-        var heatingReactorClassType = addressSpace.findObjectType("HeatingReactorClassType");
-        var mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType");
+        const namespace = addressSpace.getOwnNamespace();
+        const heatingReactorClassType = addressSpace.findObjectType("HeatingReactorClassType",namespace.index);
+        const mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType",namespace.index);
+        if (!heatingReactorClassType) {
+            throw new Error("cannot find ISA reference heatingReactorClassType");
+        }
+        if (!mixingReactorClassType) {
+            throw new Error("cannot find ISA reference MixingReactorClassType" );
+        }
 
-        var heatingMixingReactorType = addressSpace.addEquipmentType({
+        const heatingMixingReactorType = addressSpace.addEquipmentType({
             browseName: "HeatingMixingReactorType",
             equipmentLevel: EquipmentLevel.EquipmentModule,
             definedByEquipmentClass: [
@@ -100,13 +107,13 @@ exports.createEquipmentClassTypes = function (addressSpace) {
     }
 
     function defineCoordinateMeasuringMachineClassType() {
-        var coordinateMeasuringMachineClassType = addressSpace.addEquipmentClassType({
+        const coordinateMeasuringMachineClassType = addressSpace.addEquipmentClassType({
             browseName: "CoordinateMeasuringMachineClassType"
         });
     }
 
     function defineRobotClassType() {
-        var RobotClassType = addressSpace.addEquipmentClassType({
+        const RobotClassType = addressSpace.addEquipmentClassType({
             browseName: "RobotClassType"
         });
     }
@@ -128,11 +135,11 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
         exports.createEquipmentClassTypes(addressSpace);
     }
 
-    var enterpriseClassType = addressSpace.findObjectType("EnterpriseClassType");
+    const enterpriseClassType = addressSpace.findObjectType("EnterpriseClassType");
     should(enterpriseClassType).not.eql(null);
 
 
-    var enterprise = addressSpace.addEquipment({
+    const enterprise = addressSpace.addEquipment({
         browseName: "ACME Corporation",
         organizedBy: addressSpace.rootFolder.objects,
         definedByEquipmentClass: enterpriseClassType
@@ -141,9 +148,9 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     enterprise.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Enterprise.value);
 
-    var enterpriseSiteClassType = addressSpace.findObjectType("EnterpriseSiteClassType");
+    const enterpriseSiteClassType = addressSpace.findObjectType("EnterpriseSiteClassType");
 
-    var site1 = addressSpace.addEquipment({
+    const site1 = addressSpace.addEquipment({
         definedByEquipmentClass: enterpriseSiteClassType,
         browseName: "ACME Corporation- Muenchen site",
         // ISA properties
@@ -154,7 +161,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
     site1.definedByEquipmentClass[0].should.eql(enterpriseSiteClassType);
 
 
-    var site2 = addressSpace.addEquipment({
+    const site2 = addressSpace.addEquipment({
         browseName: "ACME Corporation- Marseille site",
         definedByEquipmentClass: enterpriseSiteClassType,
         // ISA properties
@@ -162,7 +169,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
     });
     site2.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Site.value);
 
-    var equipmentType = addressSpace.findISA95ObjectType("EquipmentType");
+    const equipmentType = addressSpace.findISA95ObjectType("EquipmentType");
 
     //xx site2.typeDefinition.should.eql(equipmentType);
 
@@ -170,20 +177,20 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     site2.containedByEquipment.should.eql(enterprise);
 
-    var r = site2.findReferencesEx(addressSpace.findISA95ReferenceType("MadeUpOfEquipment"),opcua.browse_service.BrowseDirection.Inverse);
+    const r = site2.findReferencesEx(addressSpace.findISA95ReferenceType("MadeUpOfEquipment"),opcua.browse_service.BrowseDirection.Inverse);
     r.length.should.eql(1);
 
-    var equipmentClassType = addressSpace.findISA95ObjectType("EquipmentClassType");
+    const equipmentClassType = addressSpace.findISA95ObjectType("EquipmentClassType");
     equipmentClassType.browseName.name.toString().should.eql("EquipmentClassType");
 
-    var workUnit1 =addressSpace.addEquipment({
+    const workUnit1 =addressSpace.addEquipment({
         definedByEquipmentClass: equipmentClassType,
         browseName: "WorkUnit A",
         equipmentLevel: opcua.ISA95.EquipmentLevel.ProductionUnit,
         containedByEquipment: site1
     });
 
-    var equipmentSet1 = addressSpace.addEquipment({
+    const equipmentSet1 = addressSpace.addEquipment({
         definedByEquipmentClass: equipmentClassType,
         browseName: "WorkUnit",
         containedByEquipment: workUnit1,
@@ -192,9 +199,9 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
     });
 
 
-    var heatingMixingReactorClassType = addressSpace.findObjectType("HeatingMixingReactorType");
+    const heatingMixingReactorClassType = addressSpace.findObjectType("HeatingMixingReactorType");
     assert(heatingMixingReactorClassType.isSupertypeOf(addressSpace.findISA95ObjectType("EquipmentType")));
-    var mixer = addressSpace.addEquipment({
+    const mixer = addressSpace.addEquipment({
         browseName: "MixerA",
         containedByEquipment: equipmentSet1,
         typeDefinition: heatingMixingReactorClassType
@@ -202,8 +209,8 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
     mixer.definedByEquipmentClass.length.should.eql(2);
 
 
-    var robotClassType = addressSpace.findObjectType("RobotClassType");
-    var robot1 = addressSpace.addEquipment({
+    const robotClassType = addressSpace.findObjectType("RobotClassType");
+    const robot1 = addressSpace.addEquipment({
         browseName: "WeldingRobot",
         containedByEquipment: equipmentSet1,
         definedByEquipmentClass: robotClassType
@@ -212,7 +219,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     function createFanucArcMateRobotType() {
         // add physicalAssets
-        var fanuc_robotArcMate = addressSpace.addPhysicalAssetType({
+        const fanuc_robotArcMate = addressSpace.addPhysicalAssetType({
             browseName: "ArcMate 100iB/6S i",
             modelNumber: "ArcMate 100iB/6S i",
             manufacturer: {
@@ -256,7 +263,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
         });
 
 
-        var axis = addressSpace.addPhysicalAsset({
+        const axis = addressSpace.addPhysicalAsset({
             containedByPhysicalAsset: fanuc_robotArcMate,
             definedByPhysicalAssetClass: "PhysicalAssetClassType",
             browseName: "Axis",
@@ -272,7 +279,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
          * @param maxSpeed  in Degree per second
          */
         function add_join(name,lowRange,highRange,maxSpeed) {
-            var join = addressSpace.addPhysicalAsset({
+            const join = addressSpace.addPhysicalAsset({
                 containedByPhysicalAsset: axis,
                 definedByPhysicalAssetClass: "PhysicalAssetClassType",
                 browseName: name,
@@ -313,17 +320,17 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
         return fanuc_robotArcMate;
     }
 
-    var fanuc_robotArcMate = createFanucArcMateRobotType(addressSpace);
+    const fanuc_robotArcMate = createFanucArcMateRobotType(addressSpace);
 
     // create the physical asset set storage  folder
     // where all our main assets will be listed
-    var physicalAssetSet = addressSpace.addObject({
+    const physicalAssetSet = addressSpace.addObject({
         browseName: "PhysicalAssetSet",
         typeDefinition: "FolderType",
         organizedBy: addressSpace.rootFolder.objects,
     });
 
-    var robot_instance = addressSpace.addPhysicalAsset({
+    const robot_instance = addressSpace.addPhysicalAsset({
         organizedBy:     physicalAssetSet,
         typeDefinition:  fanuc_robotArcMate,
         definedByPhysicalAssetClass: "PhysicalAssetClassType",

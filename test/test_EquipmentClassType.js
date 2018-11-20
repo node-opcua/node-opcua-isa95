@@ -1,29 +1,28 @@
-var should = require("should");
+const should = require("should");
+const construct_ISA95_addressSpace = require("./helpers/bootstrap").construct_ISA95_addressSpace;
+const opcua = require("node-opcua");
 
-var construct_ISA95_addressSpace = require("./helpers/bootstrap").construct_ISA95_addressSpace;
-var opcua = require("node-opcua");
+describe("ISA95 ", function () {
 
-describe("ISA95 ",function() {
+    let addressSpace = null;
 
-    var addressSpace = null;
-
-    before(function(done) {
-        construct_ISA95_addressSpace(function(err,r){
-            addressSpace=r;
+    before(function (done) {
+        construct_ISA95_addressSpace(function (err, r) {
+            addressSpace = r;
             done(err);
         });
     });
 
-    after(function(){
+    after(function () {
         if (addressSpace) {
             addressSpace.dispose();
             addressSpace = null;
         }
     });
 
-    describe("ISA95 Common services",function() {
+    describe("ISA95 Common services", function () {
 
-        it("should extend the model with new methods dedicated to IS95",function() {
+        it("should extend the model with new methods dedicated to IS95", function () {
             // ISA object must be enriched with useful ISA95 helper method
             opcua.AddressSpace.prototype.addISA95ClassProperty.should.be.instanceOf(Function);
             opcua.AddressSpace.prototype.findISA95ObjectType.should.be.instanceOf(Function);
@@ -31,9 +30,9 @@ describe("ISA95 ",function() {
         });
 
     });
-    describe("Equipment class Type",function() {
+    describe("Equipment class Type", function () {
 
-        it("should extend the model with new methods dedicated to IS95 Equipment",function() {
+        it("should extend the model with new methods dedicated to IS95 Equipment", function () {
 
             opcua.AddressSpace.prototype.addEquipmentClassType.should.be.instanceOf(Function);
             opcua.AddressSpace.prototype.addEquipmentType.should.be.instanceOf(Function);
@@ -41,12 +40,12 @@ describe("ISA95 ",function() {
 
         });
 
-        it("should create a equipment class Type",function() {
+        it("should create a equipment class Type", function () {
 
-            var myEquipmentClassType = addressSpace.addEquipmentClassType({
-                browseName:"MyEquipmentClassType"
+            const myEquipmentClassType = addressSpace.addEquipmentClassType({
+                browseName: "MyEquipmentClassType"
             });
-            myEquipmentClassType.browseName.toString().should.eql("MyEquipmentClassType");
+            myEquipmentClassType.browseName.toString().should.eql("1:MyEquipmentClassType");
             myEquipmentClassType.subtypeOfObj.browseName.toString().should.eql("1:EquipmentClassType");
 
             addressSpace.addISA95ClassProperty({
@@ -56,37 +55,37 @@ describe("ISA95 ",function() {
                 dataType: "Double"
             });
 
-            var hasISA95ClassProperty = addressSpace.findISA95ReferenceType("HasISA95ClassProperty");
+            const hasISA95ClassProperty = addressSpace.findISA95ReferenceType("HasISA95ClassProperty");
             hasISA95ClassProperty.browseName.toString().should.eql("1:HasISA95ClassProperty");
 
-            var refs = myEquipmentClassType.findReferencesEx(hasISA95ClassProperty,opcua.browse_service.BrowseDirection.Forward);
-            refs.length.should.eql(1," it should find 1 HasISA95ClassProperty reference");
+            let refs = myEquipmentClassType.findReferencesEx(hasISA95ClassProperty, opcua.browse_service.BrowseDirection.Forward);
+            refs.length.should.eql(1, " it should find 1 HasISA95ClassProperty reference");
 
-            var refs = myEquipmentClassType.findReferencesExAsObject(hasISA95ClassProperty,opcua.browse_service.BrowseDirection.Forward);
-            refs.length.should.eql(1," it should find 1 HasISA95ClassProperty reference");
+            refs = myEquipmentClassType.findReferencesExAsObject(hasISA95ClassProperty, opcua.browse_service.BrowseDirection.Forward);
+            refs.length.should.eql(1, " it should find 1 HasISA95ClassProperty reference");
 
 
         });
 
-        it("should instantiate a equipment class Type, instance object must expose the same property as its class",function() {
+        it("should instantiate a equipment class Type, instance object must expose the same property as its class", function () {
 
-            var EquipmentLevel = opcua.ISA95.EquipmentLevel;
+            const EquipmentLevel = opcua.ISA95.EquipmentLevel;
 
-            var myEquipmentClassType = addressSpace.addEquipmentClassType({
-                browseName:"MyEquipment2ClassType",
+            let myEquipmentClassType = addressSpace.addEquipmentClassType({
+                browseName: "MyEquipment2ClassType",
                 equipmentLevel: EquipmentLevel.Other
             });
 
-            var myEquipmentClassType = addressSpace.findObjectType("MyEquipment2ClassType");
+            myEquipmentClassType = addressSpace.findObjectType("1:MyEquipment2ClassType");
 
-            var equipment = addressSpace.addEquipment({
+            const equipment = addressSpace.addEquipment({
                 browseName: "MyEquipment",
-                definedByEquipmentClass:myEquipmentClassType
+                definedByEquipmentClass: myEquipmentClassType
             });
-            equipment.browseName.toString().should.eql("MyEquipment");
+            equipment.browseName.toString().should.eql("1:MyEquipment");
 
             equipment.definedByEquipmentClass.length.should.eql(1);
-            equipment.definedByEquipmentClass[0].browseName.toString().should.eql("MyEquipment2ClassType");
+            equipment.definedByEquipmentClass[0].browseName.toString().should.eql("1:MyEquipment2ClassType");
 
             equipment.typeDefinitionObj.browseName.toString().should.eql("1:EquipmentType");
 
@@ -95,30 +94,30 @@ describe("ISA95 ",function() {
             // todo
         });
 
-        it("should create nested equipments",function() {
+        it("should create nested equipments", function () {
 
-            var EquipmentLevel = opcua.ISA95.EquipmentLevel;
+            const EquipmentLevel = opcua.ISA95.EquipmentLevel;
 
-            var myEquipmentClassType = addressSpace.addEquipmentClassType({
-                browseName:"MyEquipment3ClassType",
+            const myEquipmentClassType = addressSpace.addEquipmentClassType({
+                browseName: "MyEquipment3ClassType",
                 equipmentLevel: EquipmentLevel.Other
             });
 
-            var equipment1 = addressSpace.addEquipment({
+            const equipment1 = addressSpace.addEquipment({
                 browseName: "MyEquipment1",
-                definedByEquipmentClass:myEquipmentClassType
+                definedByEquipmentClass: myEquipmentClassType
             });
 
-            var equipment2 = addressSpace.addEquipment({
+            const equipment2 = addressSpace.addEquipment({
                 browseName: "MyEquipment2",
                 containedByEquipment: equipment1,
-                definedByEquipmentClass:myEquipmentClassType
+                definedByEquipmentClass: myEquipmentClassType
             });
 
-            var equipment3 = addressSpace.addEquipment({
+            const equipment3 = addressSpace.addEquipment({
                 browseName: "MyEquipment3",
                 containedByEquipment: equipment1,
-                definedByEquipmentClass:myEquipmentClassType
+                definedByEquipmentClass: myEquipmentClassType
             });
 
             equipment2.containedByEquipment.should.eql(equipment1);
@@ -130,25 +129,23 @@ describe("ISA95 ",function() {
             equipment3.madeUpOfEquipments().length.should.eql(0);
         })
     });
-    describe("Complete Model",function(){
+    describe("Complete Model", function () {
 
-        var createEquipmentClassTypes = require("./helpers/isa95_demo_address_space").createEquipmentClassTypes;
+        const createEquipmentClassTypes = require("./helpers/isa95_demo_address_space").createEquipmentClassTypes;
 
-        before(function() {
+        before(function () {
             createEquipmentClassTypes(addressSpace);
+        });
+
+        it("should instantiate a MixingReactor", function () {
+
+            const mixingReactorClassType = addressSpace.findObjectType("1:MixingReactorClassType");
+            mixingReactorClassType.browseName.toString().should.eql("1:MixingReactorClassType");
 
         });
 
-        it("should instantiate a MixingReactor",function(){
-
-            var mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType");
-            mixingReactorClassType.browseName.toString().should.eql("MixingReactorClassType");
-
-
-        });
-
-        it("should instantiate a demo mode",function () {
-            var instantiateSampleISA95Model = require("./helpers/isa95_demo_address_space").instantiateSampleISA95Model;
+        xit("should instantiate a demo mode", function () {
+            const instantiateSampleISA95Model = require("./helpers/isa95_demo_address_space").instantiateSampleISA95Model;
             instantiateSampleISA95Model(addressSpace);
         })
 
