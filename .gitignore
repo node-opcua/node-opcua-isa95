@@ -3,3 +3,7 @@ node_modules
 t1.js
 
 package-lock\.json
+.idea
+.nyc_output
+.vscode
+coverage/
