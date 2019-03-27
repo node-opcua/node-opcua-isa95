@@ -16,18 +16,21 @@ exports.createEquipmentClassTypes = function (addressSpace) {
             equipmentLevel: EquipmentLevel.Enterprise
         });
     }
+
     function defineEnterpriseSiteClassType() {
         const enterpriseSiteClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseSiteClassType",
             equipmentLevel: EquipmentLevel.Site
         });
     }
+
     function defineEnterpriseSiteAreaClassType() {
         const enterpriseSiteAreaClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseSiteAreaClassType",
             equipmentLevel: EquipmentLevel.Area
         });
     }
+
     function defineEnterpriseSiteAreaProductionUnitClassType() {
         const enterpriseSiteAreaProductionUnitClassType = addressSpace.addEquipmentClassType({
             browseName: "EnterpriseSiteAreaProductionUnitClassType",
@@ -73,13 +76,13 @@ exports.createEquipmentClassTypes = function (addressSpace) {
     function defineHeatingMixingReactorType() {
 
         const namespace = addressSpace.getOwnNamespace();
-        const heatingReactorClassType = addressSpace.findObjectType("HeatingReactorClassType",namespace.index);
-        const mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType",namespace.index);
+        const heatingReactorClassType = addressSpace.findObjectType("HeatingReactorClassType", namespace.index);
+        const mixingReactorClassType = addressSpace.findObjectType("MixingReactorClassType", namespace.index);
         if (!heatingReactorClassType) {
             throw new Error("cannot find ISA reference heatingReactorClassType");
         }
         if (!mixingReactorClassType) {
-            throw new Error("cannot find ISA reference MixingReactorClassType" );
+            throw new Error("cannot find ISA reference MixingReactorClassType");
         }
 
         const heatingMixingReactorType = addressSpace.addEquipmentType({
@@ -127,16 +130,20 @@ exports.createEquipmentClassTypes = function (addressSpace) {
 };
 
 
-exports.instantiateSampleISA95Model = function(addressSpace) {
+exports.instantiateSampleISA95Model = function (addressSpace) {
 
     assert(addressSpace instanceof opcua.AddressSpace);
 
-    if (!addressSpace.findObjectType("EnterpriseClassType")) {
+    const nsISA95 = addressSpace.getISA95Namespace();
+    const namespace = addressSpace.getOwnNamespace();
+    const nsOwn = namespace.index;
+
+    if (!addressSpace.findObjectType("EnterpriseClassType"), nsOwn) {
         exports.createEquipmentClassTypes(addressSpace);
     }
 
-    const enterpriseClassType = addressSpace.findObjectType("EnterpriseClassType");
-    should(enterpriseClassType).not.eql(null);
+    const enterpriseClassType = addressSpace.findObjectType("EnterpriseClassType", nsOwn);
+    should.exist(enterpriseClassType);
 
 
     const enterprise = addressSpace.addEquipment({
@@ -148,7 +155,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     enterprise.equipmentLevel.readValue().value.value.should.eql(opcua.ISA95.EquipmentLevel.Enterprise.value);
 
-    const enterpriseSiteClassType = addressSpace.findObjectType("EnterpriseSiteClassType");
+    const enterpriseSiteClassType = addressSpace.findObjectType("EnterpriseSiteClassType",nsOwn);
 
     const site1 = addressSpace.addEquipment({
         definedByEquipmentClass: enterpriseSiteClassType,
@@ -177,13 +184,13 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     site2.containedByEquipment.should.eql(enterprise);
 
-    const r = site2.findReferencesEx(addressSpace.findISA95ReferenceType("MadeUpOfEquipment"),opcua.browse_service.BrowseDirection.Inverse);
+    const r = site2.findReferencesEx(addressSpace.findISA95ReferenceType("MadeUpOfEquipment"), opcua.browse_service.BrowseDirection.Inverse);
     r.length.should.eql(1);
 
     const equipmentClassType = addressSpace.findISA95ObjectType("EquipmentClassType");
     equipmentClassType.browseName.name.toString().should.eql("EquipmentClassType");
 
-    const workUnit1 =addressSpace.addEquipment({
+    const workUnit1 = addressSpace.addEquipment({
         definedByEquipmentClass: equipmentClassType,
         browseName: "WorkUnit A",
         equipmentLevel: opcua.ISA95.EquipmentLevel.ProductionUnit,
@@ -195,11 +202,11 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
         browseName: "WorkUnit",
         containedByEquipment: workUnit1,
         equipmentLevel: opcua.ISA95.EquipmentLevel.ProcessCell,
-        optionals: [ "AssetAssignment" ]
+        optionals: ["AssetAssignment"]
     });
 
 
-    const heatingMixingReactorClassType = addressSpace.findObjectType("HeatingMixingReactorType");
+    const heatingMixingReactorClassType = addressSpace.findObjectType("HeatingMixingReactorType",nsOwn);
     assert(heatingMixingReactorClassType.isSupertypeOf(addressSpace.findISA95ObjectType("EquipmentType")));
     const mixer = addressSpace.addEquipment({
         browseName: "MixerA",
@@ -209,7 +216,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
     mixer.definedByEquipmentClass.length.should.eql(2);
 
 
-    const robotClassType = addressSpace.findObjectType("RobotClassType");
+    const robotClassType = addressSpace.findObjectType("RobotClassType",nsOwn);
     const robot1 = addressSpace.addEquipment({
         browseName: "WeldingRobot",
         containedByEquipment: equipmentSet1,
@@ -224,7 +231,7 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
             modelNumber: "ArcMate 100iB/6S i",
             manufacturer: {
                 dataType: "String",
-                value: { dataType: opcua.DataType.String, value: "Fanuc Inc"}
+                value: {dataType: opcua.DataType.String, value: "Fanuc Inc"}
             }
         });
 
@@ -232,8 +239,8 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
             ISA95AttributeOf: fanuc_robotArcMate,
             browseName: "Weight",
             description: "Robot mass in kg",
-            dataType:"Double",
-            value: { dataType: opcua.DataType.Double, value: 135 },
+            dataType: "Double",
+            value: {dataType: opcua.DataType.Double, value: 135},
             modellingRule: "Mandatory"
         });
 
@@ -241,24 +248,24 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
             ISA95AttributeOf: fanuc_robotArcMate,
             browseName: "Payload",
             description: "Payload in kg",
-            dataType:"Double",
-            value: { dataType: opcua.DataType.Double, value: 6 },
+            dataType: "Double",
+            value: {dataType: opcua.DataType.Double, value: 6},
             modellingRule: "Mandatory"
         });
         addressSpace.addISA95Attribute({
             ISA95AttributeOf: fanuc_robotArcMate,
             browseName: "Repeatability",
             description: "+/-",
-            dataType:"Double",
-            value: { dataType: opcua.DataType.Double, value: 0.08 },
+            dataType: "Double",
+            value: {dataType: opcua.DataType.Double, value: 0.08},
             modellingRule: "Mandatory"
         });
         addressSpace.addISA95Attribute({
             ISA95AttributeOf: fanuc_robotArcMate,
             browseName: "HReach",
             description: "in mm",
-            dataType:"Double",
-            value: { dataType: opcua.DataType.Double, value: 1373 },
+            dataType: "Double",
+            value: {dataType: opcua.DataType.Double, value: 1373},
             modellingRule: "Mandatory"
         });
 
@@ -278,42 +285,42 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
          * @param highRange in Degree
          * @param maxSpeed  in Degree per second
          */
-        function add_join(name,lowRange,highRange,maxSpeed) {
+        function add_join(name, lowRange, highRange, maxSpeed) {
             const join = addressSpace.addPhysicalAsset({
                 containedByPhysicalAsset: axis,
                 definedByPhysicalAssetClass: "PhysicalAssetClassType",
                 browseName: name,
-                description:" the axis " + name,
+                description: " the axis " + name,
                 modellingRule: "Mandatory"
             });
             addressSpace.addISA95Attribute({
                 ISA95AttributeOf: join,
                 browseName: "RangeLow",
-                dataType:"Double",
-                value: { dataType: opcua.DataType.Double, value: lowRange },
+                dataType: "Double",
+                value: {dataType: opcua.DataType.Double, value: lowRange},
                 modellingRule: "Mandatory"
             });
             addressSpace.addISA95Attribute({
                 ISA95AttributeOf: join,
                 browseName: "RangeHigh",
-                dataType:"Double",
-                value: { dataType: opcua.DataType.Double, value: highRange },
+                dataType: "Double",
+                value: {dataType: opcua.DataType.Double, value: highRange},
                 modellingRule: "Mandatory"
             });
         }
 
-        add_join("J1",-170,170,150);
-        add_join("J2", -90,190,160);
-        add_join("J3",-170,145,170);
-        add_join("J4",-190,190,400);
-        add_join("J5",-140,140,400);
-        add_join("J6",-360,360,520);
+        add_join("J1", -170, 170, 150);
+        add_join("J2", -90, 190, 160);
+        add_join("J3", -170, 145, 170);
+        add_join("J4", -190, 190, 400);
+        add_join("J5", -140, 140, 400);
+        add_join("J6", -360, 360, 520);
 
         addressSpace.addISA95Attribute({
             ISA95AttributeOf: fanuc_robotArcMate,
             browseName: "Documentation",
             dataType: "String",
-            value: { dataType: opcua.DataType.String, value: "https://www.robots.com/fanuc/arcmate-100ib-6s"},
+            value: {dataType: opcua.DataType.String, value: "https://www.robots.com/fanuc/arcmate-100ib-6s"},
             modellingRule: "Mandatory"
         });
 
@@ -324,21 +331,21 @@ exports.instantiateSampleISA95Model = function(addressSpace) {
 
     // create the physical asset set storage  folder
     // where all our main assets will be listed
-    const physicalAssetSet = addressSpace.addObject({
+    const physicalAssetSet = namespace.addObject({
         browseName: "PhysicalAssetSet",
         typeDefinition: "FolderType",
         organizedBy: addressSpace.rootFolder.objects,
     });
 
     const robot_instance = addressSpace.addPhysicalAsset({
-        organizedBy:     physicalAssetSet,
-        typeDefinition:  fanuc_robotArcMate,
+        organizedBy: physicalAssetSet,
+        typeDefinition: fanuc_robotArcMate,
         definedByPhysicalAssetClass: "PhysicalAssetClassType",
         browseName: "FANUC Arc Mate 100iB/6S i - 001",
         implementationOf: robot1,
         vendorId: {
             dataType: "String",
-            value: { dataType: opcua.DataType.String, value: "RobotWox" }
+            value: {dataType: opcua.DataType.String, value: "RobotWox"}
         }
     });
 
