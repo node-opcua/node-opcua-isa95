@@ -1,6 +1,6 @@
 {
   "name": "node-opcua-isa95",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ISA95 server extension for node-opcua",
   "main": "index.js",
   "scripts": {
